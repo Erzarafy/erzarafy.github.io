@@ -186,6 +186,9 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 32px; }
 .contact-email { display: block; width: fit-content; margin-top: 29px; color: var(--accent); text-decoration: none; font-size: 1rem; font-weight: 700; }
 .contact-email span { margin-left: 7px; }
 .contact-phone { display: inline-block; margin-top: 9px; color: var(--muted); text-decoration: none; font: .76rem var(--font-mono); }
+.contact-social { display: block; width: fit-content; margin-top: 12px; color: var(--muted); text-decoration: none; font-size: .78rem; font-weight: 600; transition: color .2s ease; }
+.contact-social span { margin-left: 5px; color: var(--accent); }
+.contact-social:hover { color: var(--accent); }
 .contact-form { display: grid; align-content: start; gap: 9px; padding-top: 14px; }
 .contact-form label { margin-top: 12px; color: #d8dbcf; font-size: .77rem; font-weight: 600; }
 .contact-form input, .contact-form textarea { width: 100%; padding: 12px 13px; border: 1px solid var(--line); border-radius: 3px; color: var(--ink); background: var(--surface); font-size: .85rem; transition: border-color .2s ease; }
