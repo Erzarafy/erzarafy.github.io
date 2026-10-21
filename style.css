@@ -272,7 +272,7 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 32px; }
   main { padding: 0 22px; }
   .hero { min-height: auto; grid-template-columns: 1fr; padding: 93px 0 105px; }
   .hero h1 { font-size: clamp(2.7rem, 10vw, 3.7rem); }
-  .hero-art { position: absolute; top: 90px; right: -150px; width: 360px; min-height: 360px; opacity: .25; }
+  .hero-art { position: absolute; top: 90px; right: 0; left: 0; width: min(360px, calc(100vw - 44px)); min-height: 0; aspect-ratio: 1; margin: 0 auto; opacity: .25; }
   .hero-copy { z-index: 2; }
   .scroll-cue { bottom: 32px; }
   .section { padding: 82px 0; }
