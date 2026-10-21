@@ -238,13 +238,21 @@ const sectionObserver = new IntersectionObserver((entries) => {
       const currentLink = nav.querySelector(`a[href="#${entry.target.id}"]`);
       nav.querySelectorAll("a[aria-current]").forEach((link) => link.removeAttribute("aria-current"));
       currentLink?.setAttribute("aria-current", "location");
-    } else {
-      entry.target.classList.remove("is-visible");
     }
   });
 }, { rootMargin: "-20% 0px -55% 0px" });
 
 sections.forEach((section) => sectionObserver.observe(section));
+
+const footerObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    }
+  });
+});
+footerObserver.observe(document.querySelector(".site-footer"));
 
 const EMAIL_TUJUAN = "muhammaderza09@gmail.com";
 const FORMSUBMIT_URL = `https://formsubmit.co/ajax/${EMAIL_TUJUAN}`;
