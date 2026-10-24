@@ -317,3 +317,107 @@ contactForm.addEventListener("submit", async (event) => {
     sendBtn.disabled = false;
   }
 });
+
+/* ============================================================
+   ENHANCEMENT PACK — oleh Budi
+   1. Header .is-scrolled (Fix 2) + scroll progress bar
+   2. Pause animasi infinite saat hero off-screen (Fix 3)
+   3. Count-up angka proof saat terlihat
+   4. Parallax mouse hero-art (desktop, pointer halus)
+   5. Tilt 3D halus pada skill-card (desktop, pointer halus)
+   ============================================================ */
+(function () {
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isDesktop = window.matchMedia('(min-width: 761px)').matches;
+  var finePointer = window.matchMedia('(pointer: fine)').matches;
+
+  /* 1. Header solid setelah scroll + progress bar (rAF-throttled, passive) */
+  var header = document.querySelector('.site-header');
+  var progress = document.querySelector('.scroll-progress');
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var y = window.scrollY || 0;
+      if (header) header.classList.toggle('is-scrolled', y > 24);
+      if (progress && isDesktop) {
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.transform = 'scaleX(' + (max > 0 ? Math.min(y / max, 1) : 0) + ')';
+      }
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* 2. Pause animasi infinite hero saat off-screen — hemat baterai/GPU */
+  var heroArt = document.querySelector('.hero-art');
+  if (heroArt && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        heroArt.classList.toggle('anims-paused', !entry.isIntersecting);
+      });
+    }).observe(heroArt);
+  }
+
+  /* 3. Count-up angka proof (mis. 100+) saat kartu terlihat */
+  function runCounter(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10);
+    if (isNaN(target)) return;
+    if (prefersReduced) { el.textContent = target; return; }
+    var dur = 1200, t0 = performance.now();
+    function tick(now) {
+      var p = Math.min((now - t0) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  var counters = document.querySelectorAll('[data-count]');
+  if (counters.length && 'IntersectionObserver' in window) {
+    var cObs = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { runCounter(entry.target); obs.unobserve(entry.target); }
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(function (c) { cObs.observe(c); });
+  }
+
+  /* 4. Parallax mouse pada hero art — desktop + pointer halus saja */
+  if (isDesktop && finePointer && !prefersReduced && heroArt) {
+    var hero = document.querySelector('.hero');
+    var pTick = false;
+    hero.addEventListener('mousemove', function (e) {
+      if (pTick) return;
+      pTick = true;
+      requestAnimationFrame(function () {
+        var r = hero.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - 0.5;
+        var y = (e.clientY - r.top) / r.height - 0.5;
+        heroArt.style.setProperty('--px', x.toFixed(3));
+        heroArt.style.setProperty('--py', y.toFixed(3));
+        pTick = false;
+      });
+    });
+    hero.addEventListener('mouseleave', function () {
+      heroArt.style.setProperty('--px', '0');
+      heroArt.style.setProperty('--py', '0');
+    });
+  }
+
+  /* 5. Tilt 3D halus pada skill card — desktop + pointer halus saja */
+  if (isDesktop && finePointer && !prefersReduced) {
+    document.querySelectorAll('.skill-card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        var rx = ((e.clientY - r.top) / r.height - 0.5) * -7;
+        var ry = ((e.clientX - r.left) / r.width - 0.5) * 7;
+        card.style.transform =
+          'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-4px)';
+      });
+      card.addEventListener('mouseleave', function () { card.style.transform = ''; });
+    });
+  }
+})();
